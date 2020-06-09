@@ -1,12 +1,18 @@
 <template>
-    <button>{{ text }}</button>
+    <button @click="click(path)">{{ text }}</button>
 </template>
 
 <script>
 export default {
     name: 'Button',
     props: {
-        'text' : String
+        'text' : String,
+        'path' : String
+    },
+    methods: {
+        click(path) {
+            this.$router.push({name: `${path}`});
+        }
     }
 }
 </script>

@@ -1,17 +1,23 @@
 <template>
   <div id="app">
-    <Home />
+    <transition 
+      name="slide" 
+      mode="out-in" 
+      appear
+      appear-active-class="fade-active"
+      appear-class="fade-appear"
+      appear-to-class="fade-to"
+    >
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
 <script>
-import Home from './components/Home.vue'
+//import Home from './components/Home.vue'
 
 export default {
   name: 'App',
-  components: {
-    Home
-  }
 }
 </script>
 
@@ -34,6 +40,7 @@ body {
   background-color: var(--bg-color);
   font-family: VT323, monospace;
   color: white;
+  overflow: hidden;
 }
 
 @media only screen and (max-width: 1200px) {
@@ -46,5 +53,29 @@ body {
   :root {
     font-size: 5px;
   }
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.slide-enter {
+  transform: translateX(100vw);
+}
+
+.slide-leave-to {
+  transform: translateX(-100vw);
+}
+
+.fade-active {
+  transition: opacity 2s ease;
+}
+
+.fade-appear {
+  opacity: 0;
+}
+
+.fade-to {
+  opacity: 1;
 }
 </style>
