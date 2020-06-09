@@ -27,6 +27,10 @@ button {
     box-shadow: 1rem 1rem var(--accent-color);
 }
 
+button::-moz-focus-inner {
+    border: none;
+}
+
 button:active {
     transform: translate(1rem, 1rem);
     box-shadow: 0px 0px var(--accent-color);
