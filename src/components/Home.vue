@@ -5,7 +5,7 @@
    <p>All you have to do is enter the name of a city of your choice (maybe your home) and appropriately guess its location by placing a pointer on a map with no markings.
 <br> The closer you get the more points you earn.</p>
     <h3>Ready for the challenge?</h3>
-    <Button text="GO!" path="location"/>
+    <Button text="GO!" @click.native="toLocation"/>
   </div>
 </template>
 
@@ -16,6 +16,11 @@ export default {
   name: 'Home',
   components : {
     Button
+  },
+  methods: {
+    toLocation() {
+      this.$router.push({name: 'location'});
+    }
   }
 }
 </script>
