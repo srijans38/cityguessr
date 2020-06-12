@@ -14,6 +14,7 @@
         :position="m.position"
         :title="m.title"
         :clickable="true"
+        :icon="m.icon"
         :draggable="m.title ? false : true"
       />
       <GmapPolyline 
@@ -97,7 +98,8 @@ export default {
           position : {
             lat: e.latLng.lat(),
             lng: e.latLng.lng(),
-          }
+          },
+          icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
         });
       }
     },
