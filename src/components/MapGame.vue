@@ -85,7 +85,7 @@ export default {
       zoom: 4,
       center: {
         
-      }
+      },
     };
   },
   created() {
@@ -126,6 +126,7 @@ export default {
       this.zoom=Math.log(40000 / (this.distance / 2)) / Math.log(2) - 1;
       this.center.lat = (this.lat + this.path[1].lat) / 2;
       this.center.lng = (this.long + this.path[1].lng) / 2;
+      this.options.gestureHandling = "auto";
     }
   },
   computed: {
