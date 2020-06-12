@@ -1,24 +1,44 @@
 <template>
   <div>
     <GmapMap
-      :center="{'lat': lat, 'lng': long}"
+      :center="{'lat': clat, 'lng': clong}"
       :zoom="4"
       map-type-id="terrain"
       :options="options"
       style="width:100vw; height:100vh;"
-      @click="click"
-    ></GmapMap>
+      @click="clickMap"
+    >
+      <GmapMarker 
+        v-for="(m, index) in markersFiltered"
+        :key="index" 
+        :position="m.position"
+        :title="m.title"
+        :clickable="true"
+        :draggable="m.title ? false : true"
+      />
+    </GmapMap>
     <div class="ui">
       <div class="head">
         <h1>CityGuessr</h1>
+        <h1 @click="gameReset">X</h1>
       </div>
-      <p>Guess the location of {{ city }} by tapping or clicking in the map.</p>
+      <transition name="slide-down" mode="out-in">
+        <p class="info" v-if="markers.length < 2">Guess the location of {{ city }} by tapping or clicking in the map.</p>
+        <div v-else class="btns">
+          <p>Are you Sure?</p>
+          <div>  
+            <Button text="Confirm"/>
+            <Button text="Reset" @click.native="markers.pop()" />
+          </div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import { styles } from "@/mapstyle";
+import Button from "./Button";
 
 export default {
   props: ["lat", "long", "city"],
@@ -38,18 +58,53 @@ export default {
         keyboardShortcuts: false,
         styles: styles,
         draggableCursor: "default"
-      }
+      },
+      markers: [
+        {
+          title: this.city,
+          show: false,
+          position : {
+            lat: this.lat,
+            lng: this.long,
+          }
+        },
+      ]
     };
   },
   methods: {
-    click(e) {
+    clickMap(e) {
       console.log(e.latLng.lat(), e.latLng.lng());
+      if(this.markers.length < 2){
+        this.markers.push({
+          position : {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          }
+        });
+      }
+    },
+    gameReset() {
+      return this.$emit('gameReset');
     }
+  },
+  computed: {
+    clat() {
+      return this.lat + (Math.random() * 2 - 1) * 5;
+    },
+    clong() {
+      return this.long + (Math.random() * 2 - 1) * 5;
+    },
+    markersFiltered() {
+      return this.markers.filter(i => i.show !== false);
+    }
+  },
+  components: {
+    Button
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .ui {
   height: 100vh;
   width: 100vw;
@@ -60,23 +115,66 @@ export default {
   pointer-events: none;
 }
 
-p {
+p,.btns {
   margin-top: auto;
   margin-bottom: 2%;
 }
 
-h1 {
-  align-self: flex-start;
-  margin: 2rem 4rem;
+.btns {
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  div {
+    display: flex;
+  }
+  
+  button {
+    text-align: center;
+    font-size: 5rem;
+    flex-direction: row;
+    &:first-child{
+      margin-right: 2%;
+    }
+  }
 }
 
 .head {
   width: 100vw;
+  display: flex;
+
+  h1 {
+    align-self: flex-start;
+    margin: 2rem 4rem;
+
+    &:last-child {
+      margin-left: auto;
+      pointer-events: all;
+      cursor: pointer;
+    }
+  }
+
+}
+
+.slide-down-enter-active, .slide-down-leave-active {
+  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.slide-down-enter {
+  transform: translateY(25vh);
+}
+
+.slide-down-leave-to {
+  transform: translateY(25vh);
 }
 
 @media only screen and (max-width: 600px) {
-  p {
+  .info,.btns {
     margin-bottom: 20%;
+  }
+
+  .btns button {
+    font-size: 4rem;
   }
 }
 </style>

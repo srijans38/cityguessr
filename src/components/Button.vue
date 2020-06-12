@@ -8,13 +8,6 @@ export default {
   props: {
     text: String
   },
-  methods: {
-    click(path) {
-      if (path) {
-        this.$router.push({ name: `${path}` });
-      }
-    }
-  }
 };
 </script>
 
