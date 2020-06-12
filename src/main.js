@@ -9,7 +9,7 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 Vue.use(GMapVue, {
   load: {
-    key: 'AIzaSyAe-GWPVTJV598XcXRd5DzOzzz-M4NTj08',
+    key: process.env.VUE_APP_GMAP,
     libraries: 'places',
   }
 })

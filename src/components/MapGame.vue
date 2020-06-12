@@ -1,8 +1,8 @@
 <template>
   <div>
     <GmapMap
-      :center="{'lat': clat, 'lng': clong}"
-      :zoom="4"
+      :center="center"
+      :zoom="zoom"
       map-type-id="terrain"
       :options="options"
       style="width:100vw; height:100vh;"
@@ -16,6 +16,12 @@
         :clickable="true"
         :draggable="m.title ? false : true"
       />
+      <GmapPolyline 
+        v-if="confirmed"
+        :path="path"
+        :editable="false"
+        :options="{deepWatch: true}" 
+      />
     </GmapMap>
     <div class="ui">
       <div class="head">
@@ -24,10 +30,11 @@
       </div>
       <transition name="slide-down" mode="out-in">
         <p class="info" v-if="markers.length < 2">Guess the location of {{ city }} by tapping or clicking in the map.</p>
+        <p class="info" v-if="confirmed">Your Guess: {{ distance }}</p>
         <div v-else class="btns">
           <p>Are you Sure?</p>
           <div>  
-            <Button text="Confirm"/>
+            <Button text="Confirm" @click.native="confirm"/>
             <Button text="Reset" @click.native="markers.pop()" />
           </div>
         </div>
@@ -68,8 +75,19 @@ export default {
             lng: this.long,
           }
         },
-      ]
+      ],
+      confirmed: false,
+      zoom: 4,
+      center: {
+        
+      }
     };
+  },
+  created() {
+    this.center = {
+      lat: this.clat,
+      lng: this.clong
+    }
   },
   methods: {
     clickMap(e) {
@@ -85,6 +103,24 @@ export default {
     },
     gameReset() {
       return this.$emit('gameReset');
+    },
+    haversine_distance(mk1, mk2) {
+      var R = 6371.0710; // Radius of the Earth in kms
+      var rlat1 = mk1.lat * (Math.PI/180); // Convert degrees to radians
+      var rlat2 = mk2.lat * (Math.PI/180); // Convert degrees to radians
+      var difflat = rlat2-rlat1; // Radian difference (latitudes)
+      var difflon = (mk2.lng-mk1.lng) * (Math.PI/180); // Radian difference (longitudes)
+
+      var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
+      return d;
+    },
+    confirm() {
+      this.confirmed=true; 
+      this.markers[0].show=true; 
+      this.markers[1].title='Your Guess'; 
+      this.zoom=8;
+      this.center.lat = this.lat;
+      this.center.lng = this.long;
     }
   },
   computed: {
@@ -96,6 +132,16 @@ export default {
     },
     markersFiltered() {
       return this.markers.filter(i => i.show !== false);
+    },
+    path() {
+      let path = [];
+      this.markers.map(({position}) => {
+        path.push(position);
+      });
+      return path;
+    },
+    distance() {
+      return this.haversine_distance(this.path[0], this.path[1]).toFixed(2);
     }
   },
   components: {
