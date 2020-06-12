@@ -31,7 +31,7 @@
       </div>
       <transition name="slide-down" mode="out-in">
         <p class="info" v-if="markers.length < 2">Guess the location of {{ city }} by tapping or clicking in the map.</p>
-        <p class="info" v-if="confirmed">Your Guess: {{ distance }}</p>
+        <p class="info" v-if="confirmed">Your Guess: {{ distance }} kms</p>
         <div v-else class="btns">
           <p>Are you Sure?</p>
           <div>  
@@ -71,6 +71,10 @@ export default {
         {
           title: this.city,
           show: false,
+          icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+            scaledSize: {width: 55, height: 55, f: 'px', b: 'px',},
+          },
           position : {
             lat: this.lat,
             lng: this.long,
@@ -99,7 +103,6 @@ export default {
             lat: e.latLng.lat(),
             lng: e.latLng.lng(),
           },
-          icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
         });
       }
     },
@@ -120,9 +123,9 @@ export default {
       this.confirmed=true; 
       this.markers[0].show=true; 
       this.markers[1].title='Your Guess'; 
-      this.zoom=8;
-      this.center.lat = this.lat;
-      this.center.lng = this.long;
+      this.zoom=Math.log(40000 / (this.distance / 2)) / Math.log(2) - 1;
+      this.center.lat = (this.lat + this.path[1].lat) / 2;
+      this.center.lng = (this.long + this.path[1].lng) / 2;
     }
   },
   computed: {
